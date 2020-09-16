@@ -57,7 +57,7 @@
                     }
                 },
                 "modules": {
-                    "deepstream": {
+                    "NVIDIADeepStreamSDK": {
                         "version": "1.0",
                         "type": "docker",
                         "status": "running",
@@ -199,48 +199,6 @@
                                 "value": "stream-analytics-on-iot-edge"
                             }
                         }
-                    },
-                    "IoTCentralBridge": {
-                        "settings": {
-                            "image": "toolboc/iotcentralbridge:0.1.0-arm64v8",
-                            "createOptions": {
-                              "HostConfig": {
-                                  "PortBindings": {
-                                    "9010/tcp": [
-                                      {
-                                        "HostPort": "9014"
-                                      }
-                                    ]
-                                  },
-                                  "Binds": [
-                                      "/data/misc:/data/misc",
-                                      "/run/systemd:/run/systemd",
-                                      "/var/run/docker.sock:/var/run/docker.sock"
-                                  ],
-                                  "NetworkMode": "host"
-                                },
-                              "NetworkingConfig": {"EndpointsConfig": {"host":{}}}
-                            }
-                        },
-                        "type": "docker",
-                        "env": {
-                          "DEBUG_TELEMETRY": {
-                              "value": "1"
-                          },
-                          "DEBUG_ROUTING_DATA": {
-                              "value": "0"
-                          },
-                          "inferenceThrottle": {
-                              "value": 2000
-                          },
-                          "FORCE_HEALTHCHECK": {
-                              "value": "1"
-                          }
-                        },
-                        "status": "running",
-                        "restartPolicy": "always",
-                        "version": "1.0"
-                        
                     }
                 }
             }
@@ -249,11 +207,9 @@
             "properties.desired": {
                 "schemaVersion": "1.0",
                 "routes": {
-                    "deepstreamToDeepStreamAnalytics": "FROM /messages/modules/deepstream/outputs/* INTO BrokeredEndpoint(\"/modules/DeepStreamAnalytics/inputs/DeepStreamInput\")",
+                    "NVIDIADeepStreamSDKToDeepStreamAnalytics": "FROM /messages/modules/NVIDIADeepStreamSDK/outputs/* INTO BrokeredEndpoint(\"/modules/DeepStreamAnalytics/inputs/DeepStreamInput\")",
                     "DeepStreamAnalyticsToIoTHub": "FROM /messages/modules/DeepStreamAnalytics/outputs/SummarizedDetections INTO $upstream",
-                    "azureblobstorageoniotedgeToIoTHub": "FROM /messages/modules/azureblobstorageoniotedge/outputs/* INTO $upstream",
-                    "NVDSToIoTCBridge": "FROM /messages/modules/deepstream/outputs/* INTO BrokeredEndpoint(\"/modules/IoTCentralBridge/inputs/dsmessages\")",
-                    "filterToIoTHub": "FROM /messages/modules/IoTCentralBridge/* INTO $upstream"
+                    "azureblobstorageoniotedgeToIoTHub": "FROM /messages/modules/azureblobstorageoniotedge/outputs/* INTO $upstream"
                 },
                 "storeAndForwardConfiguration": {
                     "timeToLiveSecs": 7200
